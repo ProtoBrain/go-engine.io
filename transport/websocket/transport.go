@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"gopkg.in/googollee/go-engine.io.v1/base"
+	"github.com/tensor146/go-engine.io/base"
 )
 
 // DialError is the error when dialing to a server. It saves Response from

@@ -6,10 +6,10 @@ import (
 	"log"
 	"time"
 
-	"gopkg.in/googollee/go-engine.io.v1"
-	"gopkg.in/googollee/go-engine.io.v1/transport"
-	"gopkg.in/googollee/go-engine.io.v1/transport/polling"
-	"gopkg.in/googollee/go-engine.io.v1/transport/websocket"
+	"github.com/tensor146/go-engine.io"
+	"github.com/tensor146/go-engine.io/transport"
+	"github.com/tensor146/go-engine.io/transport/polling"
+	"github.com/tensor146/go-engine.io/transport/websocket"
 )
 
 func main() {

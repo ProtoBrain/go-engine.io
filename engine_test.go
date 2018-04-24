@@ -12,10 +12,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/googollee/go-engine.io.v1/base"
-	"gopkg.in/googollee/go-engine.io.v1/transport"
-	"gopkg.in/googollee/go-engine.io.v1/transport/polling"
-	"gopkg.in/googollee/go-engine.io.v1/transport/websocket"
+	"github.com/tensor146/go-engine.io/base"
+	"github.com/tensor146/go-engine.io/transport"
+	"github.com/tensor146/go-engine.io/transport/polling"
+	"github.com/tensor146/go-engine.io/transport/websocket"
 )
 
 func TestEnginePolling(t *testing.T) {

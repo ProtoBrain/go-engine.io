@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/googollee/go-engine.io.v1/base"
+	"github.com/tensor146/go-engine.io/base"
 )
 
 var tests = []struct {
