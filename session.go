@@ -20,6 +20,7 @@ type session struct {
 	context   interface{}
 
 	upgradeLocker sync.RWMutex
+	newWriterLocker sync.Mutex
 	transport     string
 	conn          base.Conn
 }
@@ -57,8 +58,8 @@ func (s *session) Transport() string {
 }
 
 func (s *session) Close() error {
-	s.upgradeLocker.RLock()
-	defer s.upgradeLocker.RUnlock()
+	s.upgradeLocker.Lock()
+	defer s.upgradeLocker.Unlock()
 	s.closeOnce.Do(func() {
 		s.manager.Remove(s.params.SID)
 	})
@@ -150,10 +151,10 @@ func (s *session) nextReader() (base.FrameType, base.PacketType, io.ReadCloser, 
 
 func (s *session) nextWriter(ft base.FrameType, pt base.PacketType) (io.WriteCloser, error) {
 	for {
-		s.upgradeLocker.RLock()
+		s.upgradeLocker.Lock()
 		w, err := s.conn.NextWriter(ft, pt)
 		if err != nil {
-			s.upgradeLocker.RUnlock()
+			s.upgradeLocker.Unlock()
 			if op, ok := err.(payload.Error); ok {
 				if op.Temporary() {
 					continue
@@ -161,8 +162,8 @@ func (s *session) nextWriter(ft base.FrameType, pt base.PacketType) (io.WriteClo
 			}
 			return nil, err
 		}
-		s.upgradeLocker.RUnlock()
-		return newWriter(w, &s.upgradeLocker), nil
+		s.upgradeLocker.Unlock()
+		return newWriter(w, &s.upgradeLocker, &s.newWriterLocker), nil
 	}
 }
 

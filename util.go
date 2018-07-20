@@ -9,18 +9,22 @@ import (
 type writer struct {
 	io.WriteCloser
 	locker    *sync.RWMutex
+	newWriterLocker *sync.Mutex
 	closeOnce sync.Once
 }
 
-func newWriter(w io.WriteCloser, locker *sync.RWMutex) *writer {
+func newWriter(w io.WriteCloser, locker *sync.RWMutex, newWriterLocker *sync.Mutex) *writer {
+	newWriterLocker.Lock()
 	return &writer{
 		WriteCloser: w,
 		locker:      locker,
+		newWriterLocker: newWriterLocker,
 	}
 }
 
 func (w *writer) Close() (err error) {
 	w.closeOnce.Do(func() {
+		defer w.newWriterLocker.Unlock()
 		w.locker.Lock()
 		defer w.locker.Unlock()
 		err = w.WriteCloser.Close()
