@@ -98,48 +98,6 @@ func (s *session) NextReader() (FrameType, io.ReadCloser, error) {
 	}
 }
 
-func (s *session) NextMtxReader(mtx *sync.Mutex) (FrameType, io.ReadCloser, error) {
-	isLocked := false
-	defer func() {
-		if isLocked {
-			mtx.Unlock()
-		}
-	}()
-	for {
-		mtx.Lock()
-		isLocked = true
-		ft, pt, r, err := s.nextReader()
-		if err != nil {
-			return 0, nil, err
-		}
-		switch pt {
-		case base.PING:
-			err := func() error {
-				w, err := s.nextWriter(ft, base.PONG)
-				if err != nil {
-					return err
-				}
-				io.Copy(w, r)
-				return w.Close()
-			}()
-			r.Close()
-			if err != nil {
-				s.Close()
-				return 0, nil, err
-			}
-			s.setDeadline()
-		case base.CLOSE:
-			r.Close()
-			s.Close()
-			return 0, nil, io.EOF
-		case base.MESSAGE:
-			return FrameType(ft), r, nil
-		}
-		r.Close()
-		mtx.Unlock()
-	}
-}
-
 func (s *session) NextWriter(typ FrameType) (io.WriteCloser, error) {
 	return s.nextWriter(base.FrameType(typ), base.MESSAGE)
 }
