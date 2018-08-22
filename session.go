@@ -133,10 +133,8 @@ func (s *session) nextReader() (base.FrameType, base.PacketType, io.ReadCloser, 
 	var r io.ReadCloser
 	var err error
 	for {
-		s.upgradeLocker.RLock()
 		ft, pt, r, err = s.conn.NextReader()
 		if err != nil {
-			s.upgradeLocker.RUnlock()
 			if op, ok := err.(payload.Error); ok {
 				if op.Temporary() {
 					continue
@@ -144,7 +142,6 @@ func (s *session) nextReader() (base.FrameType, base.PacketType, io.ReadCloser, 
 			}
 			return 0, 0, nil, err
 		}
-		s.upgradeLocker.RUnlock()
 		return ft, pt, newReader(r, &s.upgradeLocker), nil
 	}
 }
